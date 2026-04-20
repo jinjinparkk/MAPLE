@@ -1,65 +1,77 @@
-import Image from "next/image";
+import Container from '@/components/common/Container';
+import SearchForm from '@/components/search/SearchForm';
+import RecentSearches from '@/components/search/RecentSearches';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <Container>
+      <div className="mx-auto max-w-2xl py-16 sm:py-24">
+        {/* 히어로 섹션 */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            메이플 스펙업 가이드
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-4 text-lg text-gray-600">
+            예산 대비 가성비 높은 스펙업 순서를 자동으로 분석합니다
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* 검색 */}
+        <SearchForm />
+        <RecentSearches />
+
+        {/* 설명 */}
+        <div className="mt-12 grid gap-6 sm:grid-cols-3">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+            <div className="text-2xl mb-2">1</div>
+            <h3 className="font-medium text-gray-900">닉네임 입력</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              메이플스토리 캐릭터 닉네임을 입력하세요
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+            <div className="text-2xl mb-2">2</div>
+            <h3 className="font-medium text-gray-900">예산 설정</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              사용할 메소 예산을 설정하세요
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+            <div className="text-2xl mb-2">3</div>
+            <h3 className="font-medium text-gray-900">로드맵 확인</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              가성비 순으로 정렬된 강화 순서를 확인하세요
+            </p>
+          </div>
         </div>
-      </main>
-    </div>
+
+        {/* 기능 소개 */}
+        <div className="mt-12 rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">주요 기능</h2>
+          <ul className="space-y-2 text-sm text-gray-600">
+            <li className="flex gap-2">
+              <span className="text-orange-600 font-medium">-</span>
+              환산주스탯 기반 가성비 분석 (메소 대비 환산주스탯 상승률)
+            </li>
+            <li className="flex gap-2">
+              <span className="text-orange-600 font-medium">-</span>
+              스타포스 기대비용 계산 (성공/실패/파괴 확률 반영)
+            </li>
+            <li className="flex gap-2">
+              <span className="text-orange-600 font-medium">-</span>
+              심볼 레벨업 비용 대비 효율 분석
+            </li>
+            <li className="flex gap-2">
+              <span className="text-orange-600 font-medium">-</span>
+              예산 내 최적 강화 순서 자동 추천
+            </li>
+            <li className="flex gap-2">
+              <span className="text-orange-600 font-medium">-</span>
+              실시간 넥슨 API 연동으로 최신 캐릭터 정보 반영
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Container>
   );
 }
