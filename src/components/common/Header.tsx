@@ -13,9 +13,6 @@ export default function Header() {
             <Link href="/" className="hover:text-orange-600 transition-colors">
               홈
             </Link>
-            <Link href="/chat" className="hover:text-orange-600 transition-colors">
-              고스톱갤러리
-            </Link>
           </nav>
         </div>
       </Container>

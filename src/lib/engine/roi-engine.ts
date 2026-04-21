@@ -37,7 +37,7 @@ export interface UpgradeCandidate {
   itemLevel?: number;
 }
 
-/** 스타포스 불가 장비 부위 (item_equipment_part 기준) */
+/** 스타포스 불가 장비 부위 */
 const STARFORCE_EXCLUDED_PARTS = new Set([
   '훈장', '메달',
   '엠블렘',
@@ -48,51 +48,15 @@ const STARFORCE_EXCLUDED_PARTS = new Set([
   '포켓 아이템',
 ]);
 
-/** 스타포스 불가 장비 슬롯 (item_equipment_slot 기준, 직업별 part 이름이 달라도 slot은 동일) */
-const STARFORCE_EXCLUDED_SLOTS = new Set([
-  '보조무기',
-]);
-
-/** 이벤트링 / 시드링 / 스타포스 불가 반지 키워드 */
+/** 시드링/이벤트링 키워드 */
 const STARFORCE_EXCLUDED_NAME_KEYWORDS = [
-  // 시드링
   '리스트레인트', '컨티뉴어스', '리미트', '엔들리스',
-  // 1티어 이벤트링
-  '테네브리스', '글로리온', '어웨이크', '이터널 플레임',
-  // 2티어 이벤트링
-  '카오스 링', '어비스 헌터스', '크리티컬링', '딥다크',
-  // 3티어 이벤트링
-  '쥬얼링', '오닉스', '코스모스', '벤젼스', '결속의 반지',
-  // 4티어 이벤트링
-  '글로리', '원더',
-  // 기타
-  '이벤트',
+  '어웨이크', '코스모스', '글로리', '원더',
+  '카오스', '이벤트',
 ];
-
-/**
- * 장비별 현실적 스타포스 목표 성 목록 (유저 메타 기반)
- * - 이론적 최대가 아닌, 실제 효율적인 목표만 추천
- */
-function getRealisticTargets(item: EquipmentItem): number[] {
-  const name = item.item_name;
-  const itemLevel = getItemLevel(item);
-
-  // 타일런트(슈페리얼): 12성이 현실적 종착지 (최대 15성이지만 13성↑ 효율 급감)
-  if (name.includes('타일런트')) return [12];
-
-  // 118~127제: 최대 15성
-  if (itemLevel <= 127) return [15];
-
-  // 128~137제 (플라즈마 하트, 마이스터링, 데이브레이크 펜던트 등): 17성, 20성
-  if (itemLevel <= 137) return [17, 20];
-
-  // 138제 이상 일반 장비: 17성, 22성
-  return [17, 22];
-}
 
 function canStarforce(item: EquipmentItem): boolean {
   if (STARFORCE_EXCLUDED_PARTS.has(item.item_equipment_part)) return false;
-  if (STARFORCE_EXCLUDED_SLOTS.has(item.item_equipment_slot)) return false;
   if (item.starforce === undefined || item.starforce === null) return false;
   if (item.special_ring_level > 0) return false;
   const name = item.item_name;
@@ -132,8 +96,7 @@ function generateStarforceCandidates(
     const currentStar = parseInt(item.starforce) || 0;
     const itemLevel = getItemLevel(item);
 
-    // 장비별 현실적 목표 성만 추천
-    const targets = getRealisticTargets(item).filter((t) => t > currentStar);
+    const targets = [17, 22].filter((t) => t > currentStar);
 
     for (const targetStar of targets) {
       const normalCost = getExpectedTotalCost(

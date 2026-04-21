@@ -1,5 +1,6 @@
 import type { CharacterStat } from '@/lib/nexon-api/types';
 import Card from '@/components/common/Card';
+import { calculateCombatPower } from '@/lib/calculator/stat-converter';
 
 interface Props {
   stat: CharacterStat;
@@ -14,6 +15,9 @@ const DISPLAY_STATS = [
 ];
 
 export default function StatSummary({ stat, convertedMainStat }: Props) {
+  // 전투력 직접 계산 (API 값은 인게임 전투력과 다르므로)
+  const combatPower = calculateCombatPower(stat);
+
   const displayItems = stat.final_stat
     .filter((s) => DISPLAY_STATS.includes(s.stat_name))
     .map((s) => ({
@@ -24,6 +28,16 @@ export default function StatSummary({ stat, convertedMainStat }: Props) {
   return (
     <Card>
       <h2 className="text-lg font-bold text-gray-900 mb-3">스탯 요약</h2>
+
+      {/* 전투력 */}
+      {combatPower > 0 && (
+        <div className="mb-4 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-center">
+          <p className="text-sm text-blue-100">전투력</p>
+          <p className="text-3xl font-bold text-white">
+            {combatPower.toLocaleString()}
+          </p>
+        </div>
+      )}
 
       {/* 환산 주스탯 */}
       {convertedMainStat !== undefined && (

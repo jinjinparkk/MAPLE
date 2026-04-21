@@ -9,8 +9,6 @@ import CharacterClient from './CharacterClient';
 import { fetchOcid, fetchCharacterFullData } from '@/lib/nexon-api';
 import { getBestPresetEquipment } from '@/lib/utils/equipment';
 
-export const dynamic = 'force-dynamic';
-
 interface PageProps {
   params: Promise<{ nickname: string }>;
 }
@@ -33,33 +31,23 @@ export default async function CharacterPage({ params }: PageProps) {
   const { nickname } = await params;
   const decodedNickname = decodeURIComponent(nickname);
 
-  let charData: Awaited<ReturnType<typeof fetchCharacterFullData>> | null = null;
+  let charData;
   try {
     const ocid = await fetchOcid(decodedNickname);
-
-    // unstable_cache가 결과를 캐싱하므로, 재시도는 1회만 (API 호출 절약)
-    try {
-      charData = await fetchCharacterFullData(ocid);
-    } catch {
-      await new Promise((r) => setTimeout(r, 2000));
-      try {
-        charData = await fetchCharacterFullData(ocid);
-      } catch {
-        // 2번째도 실패하면 포기
-      }
-    }
+    charData = await fetchCharacterFullData(ocid);
   } catch {
-    // ignore
+    notFound();
   }
-
-  if (!charData) notFound();
 
   const bestPreset = getBestPresetEquipment(charData.equipment);
 
   return (
     <Container>
       <div className="py-8 space-y-6">
+        {/* 캐릭터 프로필 */}
         <CharacterProfile basic={charData.basic} />
+
+        {/* 스탯 + 장비/심볼 */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-6">
             <StatSummary stat={charData.stat} />
@@ -71,6 +59,8 @@ export default async function CharacterPage({ params }: PageProps) {
             presetLabel={bestPreset.label}
           />
         </div>
+
+        {/* 로드맵 (클라이언트) */}
         <CharacterClient nickname={decodedNickname} charData={charData} />
       </div>
     </Container>

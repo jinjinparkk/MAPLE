@@ -9,13 +9,13 @@ export default function CharacterProfile({ basic }: Props) {
   return (
     <Card className="flex flex-col sm:flex-row items-center gap-4">
       {basic.character_image && (
-        <div className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] shrink-0 overflow-hidden rounded-lg border border-gray-200">
-          <img
-            src={basic.character_image}
-            alt={basic.character_name}
-            className="w-full h-full object-[center_100%] scale-[2]"
-          />
-        </div>
+        <img
+          src={basic.character_image}
+          alt={basic.character_name}
+          width={96}
+          height={96}
+          className="rounded-lg border border-gray-200"
+        />
       )}
       <div className="text-center sm:text-left">
         <h1 className="text-2xl font-bold text-gray-900">{basic.character_name}</h1>

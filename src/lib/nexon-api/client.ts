@@ -1,7 +1,7 @@
 import { NEXON_API_BASE } from './endpoints';
 
-const MAX_RETRIES = 2;
-const RETRY_DELAY_MS = 1500;
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
 
 class NexonApiError extends Error {
   constructor(
@@ -42,12 +42,13 @@ export async function nexonFetch<T>(
         headers: {
           'x-nxopen-api-key': getApiKey(),
         },
-        cache: 'no-store',
+        next: { revalidate: 600 },
       });
 
-      // 429 Rate Limit — 재시도 없이 즉시 실패 (일일 한도 보호)
       if (res.status === 429) {
-        throw new NexonApiError(429, 'Rate limit 초과 — 잠시 후 다시 시도해주세요.');
+        // Rate limit — wait and retry
+        await sleep(RETRY_DELAY_MS * (attempt + 1));
+        continue;
       }
 
       if (!res.ok) {
@@ -58,11 +59,9 @@ export async function nexonFetch<T>(
       return (await res.json()) as T;
     } catch (err) {
       lastError = err as Error;
-      // 4xx 에러(429 포함)는 재시도 무의미 — 즉시 throw
-      if (err instanceof NexonApiError && err.status < 500) {
-        throw err;
+      if (err instanceof NexonApiError && err.status !== 429 && err.status < 500) {
+        throw err; // 클라이언트 에러는 재시도하지 않음
       }
-      // 5xx/네트워크 에러만 재시도
       if (attempt < MAX_RETRIES - 1) {
         await sleep(RETRY_DELAY_MS * (attempt + 1));
       }
