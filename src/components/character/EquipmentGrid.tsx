@@ -22,6 +22,52 @@ const SLOT_LAYOUT: [string, string, string][] = [
 
 const BOTTOM_SLOTS = ['메달', '안드로이드', '칭호'];
 
+/** 1:1 매핑되는 표준 부위명 (반지/펜던트/무기/보조무기 제외) */
+const SINGLE_PARTS = new Set([
+  '모자', '얼굴장식', '눈장식', '귀고리', '상의', '하의', '신발',
+  '장갑', '망토', '훈장', '벨트', '어깨장식', '포켓 아이템',
+  '기계 심장', '뱃지', '엠블렘', '메달', '안드로이드', '칭호',
+]);
+
+/** equipment 배열 → 슬롯 키 Map 변환 (중복 부위, 직업별 부위명 처리) */
+function buildEquipMap(equipment: EquipmentItem[]): Map<string, EquipmentItem> {
+  const map = new Map<string, EquipmentItem>();
+  let ringIdx = 1;
+  let pendantIdx = 1;
+  const unknowns: EquipmentItem[] = [];
+
+  for (const item of equipment) {
+    const part = item.item_equipment_part;
+
+    if (part === '반지') {
+      if (ringIdx <= 4) map.set(`반지${ringIdx++}`, item);
+    } else if (part === '펜던트') {
+      map.set(pendantIdx === 1 ? '펜던트' : '펜던트2', item);
+      pendantIdx++;
+    } else if (part === '무기') {
+      map.set('무기', item);
+    } else if (part === '보조무기') {
+      map.set('보조무기', item);
+    } else if (SINGLE_PARTS.has(part)) {
+      map.set(part, item);
+    } else {
+      // 직업별 고유 부위명 (브레이슬릿, 튜너 등) → 무기/보조무기 슬롯에 배치
+      unknowns.push(item);
+    }
+  }
+
+  // 알 수 없는 부위 → 무기 → 보조무기 순으로 빈 슬롯에 배치
+  for (const item of unknowns) {
+    if (!map.has('무기')) {
+      map.set('무기', item);
+    } else if (!map.has('보조무기')) {
+      map.set('보조무기', item);
+    }
+  }
+
+  return map;
+}
+
 export default function EquipmentGrid({ equipment, presetNo, presetLabel }: Props) {
   if (!equipment || equipment.length === 0) {
     return (
@@ -32,10 +78,7 @@ export default function EquipmentGrid({ equipment, presetNo, presetLabel }: Prop
     );
   }
 
-  const equipMap = new Map<string, EquipmentItem>();
-  for (const item of equipment) {
-    equipMap.set(item.equipment_slot, item);
-  }
+  const equipMap = buildEquipMap(equipment);
 
   // 하단 슬롯 중 장비가 있는 것만 표시
   const activeBottomSlots = BOTTOM_SLOTS.filter((slot) => equipMap.has(slot));
