@@ -17,18 +17,25 @@ export default function EquipmentCard({ item }: Props) {
   const starCount = parseInt(item.starforce) || 0;
 
   return (
-    <div className={`rounded-lg border-2 p-2 ${gradeStyle}`}>
-      <div className="flex items-start gap-2">
-        {item.item_icon && (
-          <img src={item.item_icon} alt={item.item_name} width={40} height={40} />
+    <div className={`flex items-center gap-1.5 rounded-lg border-2 p-1 min-h-[52px] ${gradeStyle}`}>
+      {item.item_icon && (
+        <img
+          src={item.item_icon}
+          alt={item.item_name}
+          width={36}
+          height={36}
+          className="shrink-0"
+        />
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-medium text-gray-900 truncate leading-tight">
+          {item.item_name}
+        </p>
+        {starCount > 0 && (
+          <p className="text-[10px] text-yellow-600 font-medium leading-tight">
+            ★{starCount}
+          </p>
         )}
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-gray-900 truncate">{item.item_name}</p>
-          <p className="text-xs text-gray-500">{item.item_equipment_part}</p>
-          {starCount > 0 && (
-            <p className="text-xs text-yellow-600 font-medium">{starCount}성</p>
-          )}
-        </div>
       </div>
     </div>
   );
