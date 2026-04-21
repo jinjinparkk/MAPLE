@@ -34,7 +34,7 @@ export default function EquipmentGrid({ equipment, presetNo, presetLabel }: Prop
 
   const equipMap = new Map<string, EquipmentItem>();
   for (const item of equipment) {
-    equipMap.set(item.item_equipment_part, item);
+    equipMap.set(item.equipment_slot, item);
   }
 
   // 하단 슬롯 중 장비가 있는 것만 표시
