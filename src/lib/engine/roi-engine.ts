@@ -75,6 +75,13 @@ function canStarforce(item: EquipmentItem): boolean {
   return true;
 }
 
+/** 타일런트(Superior) 장비 키워드 */
+const SUPERIOR_KEYWORDS = ['타일런트'];
+
+function isSuperiorItem(item: EquipmentItem): boolean {
+  return SUPERIOR_KEYWORDS.some((kw) => item.item_name.includes(kw));
+}
+
 /** 아이템 레벨별 최대 강화 가능 성수 */
 function getMaxStarByItemLevel(itemLevel: number): number {
   if (itemLevel >= 138) return 30;
@@ -115,7 +122,7 @@ function generateStarforceCandidates(
     const currentStar = parseInt(item.starforce) || 0;
     const itemLevel = getItemLevel(item);
 
-    const maxStar = getMaxStarByItemLevel(itemLevel);
+    const maxStar = isSuperiorItem(item) ? 15 : getMaxStarByItemLevel(itemLevel);
     const targets = [17, 22, 25, 30].filter((t) => t > currentStar && t <= maxStar);
 
     for (const targetStar of targets) {

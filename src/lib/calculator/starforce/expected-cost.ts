@@ -23,7 +23,7 @@ export interface StarforceCalcOptions {
  * E(n) = n성 → n+1성 기대비용 (파괴/재강화 반영, 하락 없음)
  *
  * n < 15:  E(n) = 비용 / 성공률  (파괴 없음, 실패=유지)
- * n >= 15: E(n) = [비용 + 파괴율×(아이템값 + ΣE(15..n-1))] / 성공률
+ * n >= 15: E(n) = [비용 + 파괴율×(아이템값 + ΣE(12..n-1))] / 성공률
  */
 function buildExpectedCostTable(
   maxStar: number,
@@ -35,14 +35,14 @@ function buildExpectedCostTable(
   const discountMult = 1 - costDiscount;
 
   const E: number[] = new Array(maxStar + 1).fill(0);
-  let sumFrom15 = 0;
+  let sumFrom12 = 0;
 
   for (let n = 0; n < maxStar; n++) {
     // 보장 성수면 비용만 내고 바로 성공
     if (guaranteedStars?.has(n)) {
       const cost = getAttemptCost(n, itemLevel) * discountMult;
       E[n] = cost;
-      if (n >= 15) sumFrom15 += E[n];
+      if (n >= 12) sumFrom12 += E[n];
       continue;
     }
 
@@ -58,10 +58,12 @@ function buildExpectedCostTable(
       // 파괴 없음, 실패 시 유지 → 단순 기하분포
       E[n] = cost / ps;
     } else {
-      // 실패 시 유지, 파괴 시 15성부터 재강화
-      E[n] = (cost + pd * (itemCost + sumFrom15)) / ps;
-      sumFrom15 += E[n];
+      // 실패 시 유지, 파괴 시 12성부터 재강화
+      E[n] = (cost + pd * (itemCost + sumFrom12)) / ps;
+      sumFrom12 += E[n];
     }
+
+    if (n >= 12 && n < 15) sumFrom12 += E[n];
   }
 
   return E;
