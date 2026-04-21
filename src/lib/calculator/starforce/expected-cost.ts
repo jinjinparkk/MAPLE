@@ -10,9 +10,6 @@ function estimateItemCost(_itemLevel: number): number {
   return 0;
 }
 
-/** 안전 성수: 실패해도 하락하지 않음 */
-const SAFE_STARS = new Set([10, 15, 20]);
-
 export interface StarforceCalcOptions {
   /** 시도 비용 할인율 (0.3 = 샤타포스 30% 할인) */
   costDiscount?: number;
@@ -21,13 +18,12 @@ export interface StarforceCalcOptions {
 }
 
 /**
- * 스타포스 기대비용 테이블 — 마르코프 체인
+ * 스타포스 기대비용 테이블 (2025.3 개편)
  *
- * E(n) = n성 → n+1성 기대비용 (하락/파괴/재강화 모두 반영)
+ * E(n) = n성 → n+1성 기대비용 (파괴/재강화 반영, 하락 없음)
  *
- * 일반:   E(n) = [비용 + 실패율×E(n-1) + 파괴율×(아이템값 + ΣE(12..n-1))] / 성공률
- * 안전성: E(n) = [비용 + 파괴율×(아이템값 + ΣE(12..n-1))] / 성공률
- * 0~9성:  E(n) = 비용 / 성공률
+ * n < 15:  E(n) = 비용 / 성공률  (파괴 없음, 실패=유지)
+ * n >= 15: E(n) = [비용 + 파괴율×(아이템값 + ΣE(15..n-1))] / 성공률
  */
 function buildExpectedCostTable(
   maxStar: number,
@@ -39,14 +35,14 @@ function buildExpectedCostTable(
   const discountMult = 1 - costDiscount;
 
   const E: number[] = new Array(maxStar + 1).fill(0);
-  let sumFrom12 = 0;
+  let sumFrom15 = 0;
 
   for (let n = 0; n < maxStar; n++) {
     // 보장 성수면 비용만 내고 바로 성공
     if (guaranteedStars?.has(n)) {
       const cost = getAttemptCost(n, itemLevel) * discountMult;
       E[n] = cost;
-      if (n >= 12) sumFrom12 += E[n];
+      if (n >= 15) sumFrom15 += E[n];
       continue;
     }
 
@@ -58,25 +54,13 @@ function buildExpectedCostTable(
       continue;
     }
 
-    const isSafe = SAFE_STARS.has(n);
-
-    if (n < 10) {
+    if (n < 15) {
+      // 파괴 없음, 실패 시 유지 → 단순 기하분포
       E[n] = cost / ps;
-    } else if (n < 12) {
-      if (isSafe) {
-        E[n] = cost / ps;
-      } else {
-        const pf = 1 - ps;
-        E[n] = (cost + pf * (E[n - 1] || 0)) / ps;
-      }
     } else {
-      if (isSafe) {
-        E[n] = (cost + pd * (itemCost + sumFrom12)) / ps;
-      } else {
-        const pf = 1 - ps - pd;
-        E[n] = (cost + pf * (E[n - 1] || 0) + pd * (itemCost + sumFrom12)) / ps;
-      }
-      sumFrom12 += E[n];
+      // 실패 시 유지, 파괴 시 15성부터 재강화
+      E[n] = (cost + pd * (itemCost + sumFrom15)) / ps;
+      sumFrom15 += E[n];
     }
   }
 
@@ -105,7 +89,7 @@ function getTable(
   const key = getCacheKey(itemLevel, cost, options);
   let table = tableCache.get(key);
   if (!table) {
-    table = buildExpectedCostTable(25, itemLevel, cost, options);
+    table = buildExpectedCostTable(30, itemLevel, cost, options);
     tableCache.set(key, table);
   }
   return table;

@@ -52,14 +52,20 @@ const STARFORCE_EXCLUDED_NAME_KEYWORDS = [
   '카오스', '이벤트',
 ];
 
-function isAstra(item: EquipmentItem): boolean {
-  return item.item_name.includes('아스트라');
+/** 스타포스 가능한 보조무기 키워드 화이트리스트 */
+const SUB_WEAPON_ALLOWED_KEYWORDS = [
+  '아스트라', '실드', '쉴드', '방패', '블레이드', '포스실드', '소울실드',
+];
+
+function isStarforceableSubWeapon(item: EquipmentItem): boolean {
+  const name = item.item_name;
+  return SUB_WEAPON_ALLOWED_KEYWORDS.some((kw) => name.includes(kw));
 }
 
 function canStarforce(item: EquipmentItem): boolean {
   if (STARFORCE_EXCLUDED_PARTS.has(item.item_equipment_part)) return false;
-  // 보조무기는 아스트라만 허용
-  if (item.item_equipment_part === '보조무기' && !isAstra(item)) return false;
+  // 보조무기는 화이트리스트 키워드 포함 시만 허용
+  if (item.item_equipment_part === '보조무기' && !isStarforceableSubWeapon(item)) return false;
   if (item.starforce === undefined || item.starforce === null) return false;
   if (item.special_ring_level > 0) return false;
   const name = item.item_name;
@@ -67,6 +73,16 @@ function canStarforce(item: EquipmentItem): boolean {
     if (name.includes(kw)) return false;
   }
   return true;
+}
+
+/** 아이템 레벨별 최대 강화 가능 성수 */
+function getMaxStarByItemLevel(itemLevel: number): number {
+  if (itemLevel >= 138) return 30;
+  if (itemLevel >= 128) return 20;
+  if (itemLevel >= 118) return 15;
+  if (itemLevel >= 108) return 10;
+  if (itemLevel >= 95) return 8;
+  return 5;
 }
 
 /** 장비에서 레벨 추출 */
@@ -99,8 +115,8 @@ function generateStarforceCandidates(
     const currentStar = parseInt(item.starforce) || 0;
     const itemLevel = getItemLevel(item);
 
-    const maxStar = isAstra(item) ? 30 : 22;
-    const targets = [17, 22, ...(maxStar > 22 ? [25, 30] : [])].filter((t) => t > currentStar && t <= maxStar);
+    const maxStar = getMaxStarByItemLevel(itemLevel);
+    const targets = [17, 22, 25, 30].filter((t) => t > currentStar && t <= maxStar);
 
     for (const targetStar of targets) {
       const normalCost = getExpectedTotalCost(
