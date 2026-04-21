@@ -6,12 +6,9 @@ import {
   NORMAL_OPTIONS,
 } from '@/lib/calculator/starforce/expected-cost';
 import { getTotalStarforceStatGain } from '@/lib/calculator/starforce';
-import { getSymbolLevelUpCost } from '@/lib/calculator/symbol';
-import { getSymbolStatGain } from '@/lib/calculator/symbol';
 import type { EquipmentItem, SymbolItem } from '@/lib/nexon-api/types';
-import { getSymbolType, getSymbolMaxLevel } from '@/lib/constants/symbol-table';
 
-export type UpgradeCategory = 'starforce' | 'symbol';
+export type UpgradeCategory = 'starforce';
 
 export interface UpgradeCandidate {
   id: string;
@@ -55,8 +52,14 @@ const STARFORCE_EXCLUDED_NAME_KEYWORDS = [
   '카오스', '이벤트',
 ];
 
+function isAstra(item: EquipmentItem): boolean {
+  return item.item_name.includes('아스트라');
+}
+
 function canStarforce(item: EquipmentItem): boolean {
   if (STARFORCE_EXCLUDED_PARTS.has(item.item_equipment_part)) return false;
+  // 보조무기는 아스트라만 허용
+  if (item.item_equipment_part === '보조무기' && !isAstra(item)) return false;
   if (item.starforce === undefined || item.starforce === null) return false;
   if (item.special_ring_level > 0) return false;
   const name = item.item_name;
@@ -96,7 +99,8 @@ function generateStarforceCandidates(
     const currentStar = parseInt(item.starforce) || 0;
     const itemLevel = getItemLevel(item);
 
-    const targets = [17, 22].filter((t) => t > currentStar);
+    const maxStar = isAstra(item) ? 30 : 22;
+    const targets = [17, 22, ...(maxStar > 22 ? [25, 30] : [])].filter((t) => t > currentStar && t <= maxStar);
 
     for (const targetStar of targets) {
       const normalCost = getExpectedTotalCost(
@@ -138,53 +142,15 @@ function generateStarforceCandidates(
   return candidates;
 }
 
-function generateSymbolCandidates(
-  symbols: SymbolItem[],
-  _ctx: StatContext,
-): UpgradeCandidate[] {
-  const candidates: UpgradeCandidate[] = [];
-
-  for (const symbol of symbols) {
-    const currentLevel = symbol.symbol_level;
-    const type = getSymbolType(symbol.symbol_name);
-    const maxLevel = getSymbolMaxLevel(type);
-    if (currentLevel >= maxLevel) continue;
-
-    const cost = getSymbolLevelUpCost(symbol.symbol_name, currentLevel);
-    const statGain = getSymbolStatGain(symbol.symbol_name);
-    if (cost <= 0) continue;
-
-    const roi = statGain / (cost / 1e8);
-
-    candidates.push({
-      id: `sym-${symbol.symbol_name}-${currentLevel}`,
-      category: 'symbol',
-      label: `${symbol.symbol_name} ${currentLevel}→${currentLevel + 1}`,
-      description: `심볼 레벨업`,
-      expectedCost: cost,
-      expectedCostShatar: cost, // 심볼은 이벤트 무관
-      convertedStatGain: statGain,
-      roi: Math.round(roi * 100) / 100,
-      roiShatar: Math.round(roi * 100) / 100,
-      symbolName: symbol.symbol_name,
-      fromLevel: currentLevel,
-      toLevel: currentLevel + 1,
-    });
-  }
-
-  return candidates;
-}
 
 export function generateAllCandidates(
   equipment: EquipmentItem[],
-  symbols: SymbolItem[],
+  _symbols: SymbolItem[],
   ctx: StatContext,
 ): UpgradeCandidate[] {
   const starforceCandidates = generateStarforceCandidates(equipment, ctx);
-  const symbolCandidates = generateSymbolCandidates(symbols, ctx);
 
-  const all = [...starforceCandidates, ...symbolCandidates];
-  all.sort((a, b) => b.roi - a.roi);
+  starforceCandidates.sort((a, b) => b.roi - a.roi);
 
-  return all;
+  return starforceCandidates;
 }

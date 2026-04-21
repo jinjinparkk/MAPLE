@@ -20,7 +20,6 @@ interface Props {
 
 const CATEGORY_COLORS = {
   starforce: '#f59e0b',
-  symbol: '#3b82f6',
 };
 
 function formatMeso(value: number): string {
@@ -57,9 +56,6 @@ export default function RoiChart({ candidates, maxItems = 15 }: Props) {
       <div className="flex gap-4 mb-2 text-xs">
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded bg-yellow-500" /> 스타포스
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-blue-500" /> 심볼
         </span>
       </div>
       <p className="text-xs text-gray-400 mb-2">막대가 짧을수록 가성비 좋음 (평소 기준)</p>
