@@ -105,56 +105,62 @@ export interface PotentialOption {
 
 // ════════════════════════════════════════
 //  윗잠 (main) — 일반 (Lv < 250)
-// ═══════���════════════════════════════════
+//  가중치 출처: 넥슨 공식 확률 공개 (maplestory.nexon.com)
+//  주스탯 = 캐릭터의 주 스탯 1종 (4스탯 중 1개)
+//  공/마 = ATK 또는 MATK 1종 (직업에 따라)
+// ════════════════════════════════════════
 
 const MAIN_WEAPON_LEG: PotentialOption[] = [
-  { key: 'boss40', label: '보스뎀 40%', type: 'boss_dmg', value: 40, weight: 6 },
-  { key: 'boss35', label: '보스뎀 35%', type: 'boss_dmg', value: 35, weight: 8 },
-  { key: 'boss30', label: '보스뎀 30%', type: 'boss_dmg', value: 30, weight: 8 },
-  { key: 'ied40', label: '방무 40%', type: 'ied', value: 40, weight: 6 },
-  { key: 'ied35', label: '방무 35%', type: 'ied', value: 35, weight: 8 },
-  { key: 'atk12', label: '공/마 12%', type: 'atk_pct', value: 12, weight: 8 },
+  // 넥슨 공식: boss40=6, boss35=12, ied40=6, ied35=6, ATK/MATK=6, stat(1종)=12, allstat=9, dmg=6, 기타=60 / total=123
+  { key: 'boss40', label: '보스뎀 40%', type: 'boss_dmg', value: 40, weight: 5 },
+  { key: 'boss35', label: '보스뎀 35%', type: 'boss_dmg', value: 35, weight: 10 },
+  { key: 'ied40', label: '방무 40%', type: 'ied', value: 40, weight: 5 },
+  { key: 'ied35', label: '방무 35%', type: 'ied', value: 35, weight: 5 },
+  { key: 'atk12', label: '공/마 12%', type: 'atk_pct', value: 12, weight: 5 },
   { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 10 },
-  { key: 'allstat9', label: '올스탯 9%', type: 'allStat_pct', value: 9, weight: 6 },
-  { key: 'dmg12', label: '데미지 12%', type: 'damage_pct', value: 12, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 32 },
+  { key: 'allstat9', label: '올스탯 9%', type: 'allStat_pct', value: 9, weight: 7 },
+  { key: 'dmg12', label: '데미지 12%', type: 'damage_pct', value: 12, weight: 5 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 48 },
 ];
 
 const MAIN_WEAPON_UNI: PotentialOption[] = [
   { key: 'boss30u', label: '보스뎀 30%', type: 'boss_dmg', value: 30, weight: 8 },
-  { key: 'ied30u', label: '방무 30%', type: 'ied', value: 30, weight: 8 },
-  { key: 'atk9', label: '공/마 9%', type: 'atk_pct', value: 9, weight: 10 },
-  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 10 },
-  { key: 'allstat6', label: '��스탯 6%', type: 'allStat_pct', value: 6, weight: 8 },
-  { key: 'dmg9', label: '데미지 9%', type: 'damage_pct', value: 9, weight: 8 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 48 },
+  { key: 'ied30u', label: '방무 30%', type: 'ied', value: 30, weight: 5 },
+  { key: 'atk9', label: '공/마 9%', type: 'atk_pct', value: 9, weight: 5 },
+  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 8 },
+  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 6 },
+  { key: 'dmg9', label: '데미지 9%', type: 'damage_pct', value: 9, weight: 5 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 63 },
 ];
 
 const MAIN_GLOVE_LEG: PotentialOption[] = [
-  { key: 'critdmg8', label: '크뎀 8%', type: 'crit_dmg', value: 8, weight: 5 },
-  { key: 'stat12', label: '주���탯 12%', type: 'mainStat_pct', value: 12, weight: 14 },
-  { key: 'allstat9', label: '올스�� 9%', type: 'allStat_pct', value: 9, weight: 8 },
-  { key: 'atk12', label: '공/마 12%', type: 'atk_pct', value: 12, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 65 },
+  // 장갑은 공/마% 옵션 없음. 크뎀 8%가 장갑 전용 레전 옵션.
+  // 넥슨 공식: 크뎀=stat옵션과 동일 확률 (~10%)
+  { key: 'critdmg8', label: '크뎀 8%', type: 'crit_dmg', value: 8, weight: 10 },
+  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 10 },
+  { key: 'allstat9', label: '올스탯 9%', type: 'allStat_pct', value: 9, weight: 8 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 72 },
 ];
 
 const MAIN_GLOVE_UNI: PotentialOption[] = [
-  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 14 },
-  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 10 },
-  { key: 'atk9', label: '공/마 9%', type: 'atk_pct', value: 9, weight: 10 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 66 },
+  // 유니크 장갑: 크뎀 없음, 공/마% 없음
+  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 8 },
+  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 6 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 86 },
 ];
 
 const MAIN_ARMOR_LEG: PotentialOption[] = [
-  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 14 },
+  // 넥슨 공식: 주스탯(1종)=8/78=10.26%, 올스탯=6/78=7.69%
+  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 10 },
   { key: 'allstat9', label: '올스탯 9%', type: 'allStat_pct', value: 9, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 78 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 82 },
 ];
 
 const MAIN_ARMOR_UNI: PotentialOption[] = [
-  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 14 },
-  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 10 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 76 },
+  // 유니크 방어구: 주스탯(1종)~8%, 올스탯~6%
+  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 8 },
+  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 6 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 86 },
 ];
 
 // ════════════════════════════════════════
@@ -164,53 +170,50 @@ const MAIN_ARMOR_UNI: PotentialOption[] = [
 // ════════════════════════════════════════
 
 const MAIN250_WEAPON_LEG: PotentialOption[] = [
-  { key: 'boss40', label: '보스뎀 40%', type: 'boss_dmg', value: 40, weight: 6 },
-  { key: 'boss35', label: '보스뎀 35%', type: 'boss_dmg', value: 35, weight: 8 },
-  { key: 'boss30', label: '보스뎀 30%', type: 'boss_dmg', value: 30, weight: 8 },
-  { key: 'ied40', label: '방무 40%', type: 'ied', value: 40, weight: 6 },
-  { key: 'ied35', label: '방무 35%', type: 'ied', value: 35, weight: 8 },
-  { key: 'atk13', label: '공/마 13%', type: 'atk_pct', value: 13, weight: 8 },
-  { key: 'stat13', label: '주스탯 13%', type: 'mainStat_pct', value: 13, weight: 10 },
-  { key: 'allstat10', label: '올스탯 10%', type: 'allStat_pct', value: 10, weight: 6 },
-  { key: 'dmg13', label: '데미지 13%', type: 'damage_pct', value: 13, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 32 },
+  { key: 'boss40', label: '보스뎀 40%', type: 'boss_dmg', value: 40, weight: 5 },
+  { key: 'boss35', label: '보스뎀 35%', type: 'boss_dmg', value: 35, weight: 10 },
+  { key: 'ied40', label: '방무 40%', type: 'ied', value: 40, weight: 5 },
+  { key: 'ied35', label: '방무 35%', type: 'ied', value: 35, weight: 5 },
+  { key: 'atk13', label: '공/마 13%', type: 'atk_pct', value: 13, weight: 5 },
+  { key: 'stat13', label: '주스�� 13%', type: 'mainStat_pct', value: 13, weight: 10 },
+  { key: 'allstat10', label: '올스탯 10%', type: 'allStat_pct', value: 10, weight: 7 },
+  { key: 'dmg13', label: '데미�� 13%', type: 'damage_pct', value: 13, weight: 5 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 48 },
 ];
 
 const MAIN250_WEAPON_UNI: PotentialOption[] = [
   { key: 'boss30u', label: '보스뎀 30%', type: 'boss_dmg', value: 30, weight: 8 },
-  { key: 'ied30u', label: '방무 30%', type: 'ied', value: 30, weight: 8 },
-  { key: 'atk10', label: '공/마 10%', type: 'atk_pct', value: 10, weight: 10 },
-  { key: 'stat10', label: '주스탯 10%', type: 'mainStat_pct', value: 10, weight: 10 },
-  { key: 'allstat7', label: '올스탯 7%', type: 'allStat_pct', value: 7, weight: 8 },
-  { key: 'dmg10', label: '데미지 10%', type: 'damage_pct', value: 10, weight: 8 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 48 },
+  { key: 'ied30u', label: '방무 30%', type: 'ied', value: 30, weight: 5 },
+  { key: 'atk10', label: '공/마 10%', type: 'atk_pct', value: 10, weight: 5 },
+  { key: 'stat10', label: '주스탯 10%', type: 'mainStat_pct', value: 10, weight: 8 },
+  { key: 'allstat7', label: '올��탯 7%', type: 'allStat_pct', value: 7, weight: 6 },
+  { key: 'dmg10', label: '데미지 10%', type: 'damage_pct', value: 10, weight: 5 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 63 },
 ];
 
 const MAIN250_GLOVE_LEG: PotentialOption[] = [
-  { key: 'critdmg8', label: '크뎀 8%', type: 'crit_dmg', value: 8, weight: 5 },
-  { key: 'stat13', label: '주스탯 13%', type: 'mainStat_pct', value: 13, weight: 14 },
+  { key: 'critdmg8', label: '크뎀 8%', type: 'crit_dmg', value: 8, weight: 10 },
+  { key: 'stat13', label: '주스탯 13%', type: 'mainStat_pct', value: 13, weight: 10 },
   { key: 'allstat10', label: '올스탯 10%', type: 'allStat_pct', value: 10, weight: 8 },
-  { key: 'atk13', label: '공/마 13%', type: 'atk_pct', value: 13, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 65 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 72 },
 ];
 
 const MAIN250_GLOVE_UNI: PotentialOption[] = [
-  { key: 'stat10', label: '주스탯 10%', type: 'mainStat_pct', value: 10, weight: 14 },
-  { key: 'allstat7', label: '올스탯 7%', type: 'allStat_pct', value: 7, weight: 10 },
-  { key: 'atk10', label: '공/마 10%', type: 'atk_pct', value: 10, weight: 10 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 66 },
+  { key: 'stat10', label: '주스탯 10%', type: 'mainStat_pct', value: 10, weight: 8 },
+  { key: 'allstat7', label: '올스탯 7%', type: 'allStat_pct', value: 7, weight: 6 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 86 },
 ];
 
 const MAIN250_ARMOR_LEG: PotentialOption[] = [
-  { key: 'stat13', label: '주스탯 13%', type: 'mainStat_pct', value: 13, weight: 14 },
+  { key: 'stat13', label: '주스탯 13%', type: 'mainStat_pct', value: 13, weight: 10 },
   { key: 'allstat10', label: '올스탯 10%', type: 'allStat_pct', value: 10, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 78 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 82 },
 ];
 
 const MAIN250_ARMOR_UNI: PotentialOption[] = [
-  { key: 'stat10', label: '주스탯 10%', type: 'mainStat_pct', value: 10, weight: 14 },
-  { key: 'allstat7', label: '올스탯 7%', type: 'allStat_pct', value: 7, weight: 10 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 76 },
+  { key: 'stat10', label: '주스탯 10%', type: 'mainStat_pct', value: 10, weight: 8 },
+  { key: 'allstat7', label: '올스탯 7%', type: 'allStat_pct', value: 7, weight: 6 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 86 },
 ];
 
 // ════════════════════════════════════════
@@ -225,50 +228,49 @@ const MAIN250_ARMOR_UNI: PotentialOption[] = [
 
 const ADDI_WEAPON_LEG: PotentialOption[] = [
   { key: 'boss18', label: '보스뎀 18%', type: 'boss_dmg', value: 18, weight: 4 },
-  { key: 'boss12', label: '보스뎀 12%', type: 'boss_dmg', value: 12, weight: 6 },
-  { key: 'ied5', label: '방무 5%', type: 'ied', value: 5, weight: 6 },
-  { key: 'atk12', label: '공/마 12%', type: 'atk_pct', value: 12, weight: 8 },
+  { key: 'boss12', label: '보스뎀 12%', type: 'boss_dmg', value: 12, weight: 5 },
+  { key: 'ied5', label: '방무 5%', type: 'ied', value: 5, weight: 5 },
+  { key: 'atk12', label: '공/마 12%', type: 'atk_pct', value: 12, weight: 5 },
   { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 10 },
   { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 6 },
-  { key: 'dmg12', label: '데미지 12%', type: 'damage_pct', value: 12, weight: 6 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 54 },
+  { key: 'dmg12', label: '데미지 12%', type: 'damage_pct', value: 12, weight: 5 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 60 },
 ];
 
 const ADDI_WEAPON_UNI: PotentialOption[] = [
-  { key: 'boss12u', label: '보스뎀 12%', type: 'boss_dmg', value: 12, weight: 6 },
-  { key: 'ied3u', label: '방무 3%', type: 'ied', value: 3, weight: 6 },
-  { key: 'atk9', label: '공/마 9%', type: 'atk_pct', value: 9, weight: 10 },
-  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 10 },
-  { key: 'allstat5', label: '올스탯 5%', type: 'allStat_pct', value: 5, weight: 8 },
-  { key: 'dmg9', label: '데미지 9%', type: 'damage_pct', value: 9, weight: 8 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 52 },
-];
-
-const ADDI_GLOVE_LEG: PotentialOption[] = [
-  { key: 'critdmg3', label: '크뎀 3%', type: 'crit_dmg', value: 3, weight: 5 },
-  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 14 },
-  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 8 },
-  { key: 'atk12', label: '공/마 12%', type: 'atk_pct', value: 12, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 65 },
-];
-
-const ADDI_GLOVE_UNI: PotentialOption[] = [
-  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 14 },
-  { key: 'allstat5', label: '올스탯 5%', type: 'allStat_pct', value: 5, weight: 10 },
-  { key: 'atk9', label: '공/마 9%', type: 'atk_pct', value: 9, weight: 10 },
+  { key: 'boss12u', label: '보스뎀 12%', type: 'boss_dmg', value: 12, weight: 5 },
+  { key: 'ied3u', label: '방무 3%', type: 'ied', value: 3, weight: 5 },
+  { key: 'atk9', label: '공/마 9%', type: 'atk_pct', value: 9, weight: 5 },
+  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 8 },
+  { key: 'allstat5', label: '올스탯 5%', type: 'allStat_pct', value: 5, weight: 6 },
+  { key: 'dmg9', label: '데미지 9%', type: 'damage_pct', value: 9, weight: 5 },
   { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 66 },
 ];
 
-const ADDI_ARMOR_LEG: PotentialOption[] = [
-  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 14 },
+const ADDI_GLOVE_LEG: PotentialOption[] = [
+  // 에디 장갑: 크뎀 3% (윗잠 8%보다 낮음), 공/마% 없음
+  { key: 'critdmg3', label: '크뎀 3%', type: 'crit_dmg', value: 3, weight: 10 },
+  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 10 },
   { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 8 },
-  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 78 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 72 },
+];
+
+const ADDI_GLOVE_UNI: PotentialOption[] = [
+  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 8 },
+  { key: 'allstat5', label: '올스탯 5%', type: 'allStat_pct', value: 5, weight: 6 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 86 },
+];
+
+const ADDI_ARMOR_LEG: PotentialOption[] = [
+  { key: 'stat12', label: '주스탯 12%', type: 'mainStat_pct', value: 12, weight: 10 },
+  { key: 'allstat6', label: '올스탯 6%', type: 'allStat_pct', value: 6, weight: 8 },
+  { key: 'other_l', label: '기타', type: 'other', value: 0, weight: 82 },
 ];
 
 const ADDI_ARMOR_UNI: PotentialOption[] = [
-  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 14 },
-  { key: 'allstat5', label: '올스탯 5%', type: 'allStat_pct', value: 5, weight: 10 },
-  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 76 },
+  { key: 'stat9', label: '주스탯 9%', type: 'mainStat_pct', value: 9, weight: 8 },
+  { key: 'allstat5', label: '올스탯 5%', type: 'allStat_pct', value: 5, weight: 6 },
+  { key: 'other_u', label: '기타', type: 'other', value: 0, weight: 86 },
 ];
 
 // ─── 옵션 풀 접근 ───
