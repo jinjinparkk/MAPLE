@@ -6,7 +6,7 @@ export default function StarforceCard({ data }: { data: WrappedData }) {
   const { starforce } = data;
 
   return (
-    <div className="wrapped-card card-bg-starforce" data-card-index={3}>
+    <div className="wrapped-card card-bg-starforce" data-card-index={2}>
       <div className="flex flex-col items-center gap-8 text-center max-w-md">
         <p className="card-label animate-fade-in-up">Starforce</p>
 

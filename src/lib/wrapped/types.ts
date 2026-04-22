@@ -51,7 +51,6 @@ export interface WrappedData {
   worldName: string;
   guildName: string | null;
   characterImage: string;
-  combatPower: number;
   starforce: StarforceAnalysis;
   potential: PotentialAnalysis;
   symbol: SymbolAnalysis;

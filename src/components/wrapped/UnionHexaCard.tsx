@@ -6,7 +6,7 @@ export default function UnionHexaCard({ data }: { data: WrappedData }) {
   const { union, hexa } = data;
 
   return (
-    <div className="wrapped-card card-bg-union" data-card-index={6}>
+    <div className="wrapped-card card-bg-union" data-card-index={5}>
       <div className="flex flex-col items-center gap-8 text-center max-w-md">
         {/* 유니온 섹션 */}
         <div className="space-y-4 w-full">

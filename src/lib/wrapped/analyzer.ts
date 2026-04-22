@@ -184,12 +184,6 @@ function analyzeHexa(data: CharacterFullData): HexaAnalysis {
   return analysis;
 }
 
-function getCombatPower(data: CharacterFullData): number {
-  const stats = data.stat?.final_stat ?? [];
-  const combatPowerStat = stats.find((s) => s.stat_name === '전투력');
-  return combatPowerStat ? parseInt(combatPowerStat.stat_value) || 0 : 0;
-}
-
 export function analyzeCharacter(data: CharacterFullData): WrappedData {
   const { equipment: bestEquipment } = getBestPresetEquipment(data.equipment);
 
@@ -206,7 +200,6 @@ export function analyzeCharacter(data: CharacterFullData): WrappedData {
     worldName: data.basic.world_name,
     guildName: data.basic.character_guild_name,
     characterImage: data.basic.character_image,
-    combatPower: getCombatPower(data),
     starforce,
     potential,
     symbol,

@@ -6,7 +6,7 @@ export default function PotentialCard({ data }: { data: WrappedData }) {
   const { potential } = data;
 
   return (
-    <div className="wrapped-card card-bg-potential" data-card-index={4}>
+    <div className="wrapped-card card-bg-potential" data-card-index={3}>
       <div className="flex flex-col items-center gap-8 text-center max-w-md">
         <p className="card-label animate-fade-in-up">Potential</p>
 

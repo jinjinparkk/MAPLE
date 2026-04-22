@@ -6,7 +6,7 @@ export default function SymbolCard({ data }: { data: WrappedData }) {
   const { symbol } = data;
 
   return (
-    <div className="wrapped-card card-bg-symbol" data-card-index={5}>
+    <div className="wrapped-card card-bg-symbol" data-card-index={4}>
       <div className="flex flex-col items-center gap-8 text-center max-w-md">
         <p className="card-label animate-fade-in-up">Symbol</p>
 
