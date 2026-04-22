@@ -13,3 +13,18 @@ export {
   getSymbolMesoCost,
   getSymbolMaxLevel,
 } from './symbol-table';
+export {
+  getResetCost,
+  getOptionPool,
+  getEquipmentPotentialCategory,
+  parsePotentialGrade,
+  POTENTIAL_EXCLUDED_PARTS,
+  TIER_UP_RATES,
+  PITY_COUNT,
+  LINE_GRADE_PROB,
+} from './potential-table';
+export type {
+  PotentialGrade,
+  PotentialType,
+  EquipPotentialCategory,
+} from './potential-table';

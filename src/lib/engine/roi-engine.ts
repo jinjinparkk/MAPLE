@@ -6,9 +6,25 @@ import {
   NORMAL_OPTIONS,
 } from '@/lib/calculator/starforce/expected-cost';
 import { getTotalStarforceStatGain } from '@/lib/calculator/starforce';
+import {
+  parsePotential,
+  getPotentialConvertedStat,
+  getExpectedResetCost,
+  getCurrentStatPercent,
+  getCurrentCritLines,
+  getArmorTargets,
+  getWeaponTargets,
+  getGloveTargets,
+} from '@/lib/calculator/potential';
+import {
+  getEquipmentPotentialCategory,
+  parsePotentialGrade,
+  POTENTIAL_EXCLUDED_PARTS,
+} from '@/lib/constants/potential-table';
+import type { PotentialType } from '@/lib/constants/potential-table';
 import type { EquipmentItem, SymbolItem } from '@/lib/nexon-api/types';
 
-export type UpgradeCategory = 'starforce';
+export type UpgradeCategory = 'starforce' | 'potential';
 
 export interface UpgradeCandidate {
   id: string;
@@ -17,7 +33,7 @@ export interface UpgradeCandidate {
   description: string;
   /** 평소 기대비용 */
   expectedCost: number;
-  /** 샤타포스 기대비용 */
+  /** 샤타포스 기대비용 (잠재능력은 평소와 동일) */
   expectedCostShatar: number;
   convertedStatGain: number;
   /** 평소 ROI (환산스탯/억) */
@@ -32,6 +48,14 @@ export interface UpgradeCandidate {
   toLevel?: number;
   /** 장비 레벨 (스타포스 후보용) */
   itemLevel?: number;
+  /** 잠재능력 타입 */
+  potentialType?: PotentialType;
+  /** 현재 잠재 요약 (e.g. "LUK 9%+9%+9% = 27%") */
+  currentPotentialSummary?: string;
+  /** 목표 잠재 라벨 (e.g. "스탯 33%") */
+  targetPotentialLabel?: string;
+  /** 같은 장비+타입의 후보끼리 중복 방지 그룹 */
+  exclusionGroup?: string;
 }
 
 /** 스타포스 불가 장비 부위 */
@@ -166,14 +190,152 @@ function generateStarforceCandidates(
 }
 
 
+/** 잠재능력 불가 판별 */
+function canPotential(item: EquipmentItem): boolean {
+  if (POTENTIAL_EXCLUDED_PARTS.has(item.item_equipment_part)) return false;
+  if (item.special_ring_level > 0) return false;
+  return true;
+}
+
+/** 현재 잠재 요약 텍스트 생성 */
+function buildPotentialSummary(lines: { type: string; value: number; rawText: string }[]): string {
+  if (lines.length === 0) return '없음';
+  return lines
+    .map((l) => {
+      if (l.type === 'other') return '기타';
+      return `${l.value}%`;
+    })
+    .join('+');
+}
+
+function generatePotentialCandidatesForType(
+  equipment: EquipmentItem[],
+  ctx: StatContext,
+  potentialType: PotentialType,
+): UpgradeCandidate[] {
+  const candidates: UpgradeCandidate[] = [];
+
+  for (const item of equipment) {
+    if (!canPotential(item)) continue;
+
+    const isMain = potentialType === 'main';
+    const gradeStr = isMain
+      ? item.potential_option_grade
+      : item.additional_potential_option_grade;
+    const line1 = isMain ? item.potential_option_1 : item.additional_potential_option_1;
+    const line2 = isMain ? item.potential_option_2 : item.additional_potential_option_2;
+    const line3 = isMain ? item.potential_option_3 : item.additional_potential_option_3;
+
+    // 잠재가 없으면 스킵
+    const grade = parsePotentialGrade(gradeStr);
+    if (!grade) continue;
+    // 레어/에픽은 ROI 대상에서 제외 (업그레이드 우선순위 낮음)
+    if (grade === 'rare' || grade === 'epic') continue;
+
+    const parsed = parsePotential(gradeStr, line1, line2, line3, ctx.jobName);
+    const currentConverted = getPotentialConvertedStat(parsed, ctx);
+    const currentStatPct = getCurrentStatPercent(parsed.lines);
+    const currentCritLines = getCurrentCritLines(parsed.lines);
+
+    const itemLevel = getItemLevel(item);
+    const equipCategory = getEquipmentPotentialCategory(item.item_equipment_part);
+    const targetGrade = 'legendary' as const;
+
+    // 타겟 생성
+    let targets;
+    if (equipCategory === 'weapon') {
+      targets = getWeaponTargets(currentConverted);
+    } else if (equipCategory === 'glove') {
+      targets = getGloveTargets(currentStatPct, currentCritLines);
+    } else {
+      targets = getArmorTargets(currentStatPct, itemLevel);
+    }
+
+    const typeLabel = isMain ? '윗잠' : '에디';
+    const exclusionGroup = `pot-${potentialType}-${item.item_name}`;
+    const currentSummary = buildPotentialSummary(parsed.lines);
+
+    for (const target of targets) {
+      // 타겟 환산스탯 계산 (stat% 기반 타겟의 경우 환산 추정)
+      let targetConverted: number;
+      if (target.minConvertedStat !== undefined) {
+        targetConverted = target.minConvertedStat;
+      } else {
+        // stat% 기반: 타겟 stat%를 환산스탯으로 변환
+        const targetStatPct = target.minStatPercent ?? currentStatPct;
+        targetConverted = convertToMainStat(ctx, {
+          mainStat: ctx.mainStat * targetStatPct / 100,
+        });
+        // 크뎀이 포함된 타겟은 크뎀 가치도 합산
+        if (target.minCritDmgLines && target.minCritDmgLines > 0) {
+          const critPerLine = isMain ? 8 : 4; // 에디 크뎀은 4%
+          targetConverted += convertToMainStat(ctx, {
+            critDamage: critPerLine * target.minCritDmgLines,
+          });
+        }
+      }
+
+      const statGain = targetConverted - currentConverted;
+      if (statGain <= 0) continue;
+
+      const cost = getExpectedResetCost(
+        equipCategory,
+        itemLevel,
+        grade,
+        targetGrade,
+        target,
+        ctx,
+        potentialType,
+        currentConverted,
+      );
+
+      if (!isFinite(cost) || cost <= 0) continue;
+
+      const roi = statGain / (cost / 1e8);
+
+      candidates.push({
+        id: `pot-${potentialType}-${item.item_name}-${target.label}`,
+        category: 'potential',
+        label: `${item.item_name} ${typeLabel} → ${target.label}`,
+        description: `잠재능력 ${typeLabel} (Lv.${itemLevel})`,
+        expectedCost: cost,
+        expectedCostShatar: cost, // 잠재능력은 샤타포스 할인 없음
+        convertedStatGain: Math.round(statGain * 10) / 10,
+        roi: Math.round(roi * 100) / 100,
+        roiShatar: Math.round(roi * 100) / 100,
+        equipmentName: item.item_name,
+        itemLevel,
+        potentialType,
+        currentPotentialSummary: `${currentSummary} (${grade})`,
+        targetPotentialLabel: target.label,
+        exclusionGroup,
+      });
+    }
+  }
+
+  return candidates;
+}
+
+function generatePotentialCandidates(
+  equipment: EquipmentItem[],
+  ctx: StatContext,
+): UpgradeCandidate[] {
+  const mainCandidates = generatePotentialCandidatesForType(equipment, ctx, 'main');
+  const addiCandidates = generatePotentialCandidatesForType(equipment, ctx, 'additional');
+  return [...mainCandidates, ...addiCandidates];
+}
+
+
 export function generateAllCandidates(
   equipment: EquipmentItem[],
   _symbols: SymbolItem[],
   ctx: StatContext,
 ): UpgradeCandidate[] {
   const starforceCandidates = generateStarforceCandidates(equipment, ctx);
+  const potentialCandidates = generatePotentialCandidates(equipment, ctx);
 
-  starforceCandidates.sort((a, b) => b.roi - a.roi);
+  const all = [...starforceCandidates, ...potentialCandidates];
+  all.sort((a, b) => b.roi - a.roi);
 
-  return starforceCandidates;
+  return all;
 }

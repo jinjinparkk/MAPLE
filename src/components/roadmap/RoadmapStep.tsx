@@ -21,12 +21,14 @@ function formatCostPerStat(cost: number, statGain: number): string {
   return formatMeso(perStat);
 }
 
-const CATEGORY_COLORS = {
+const CATEGORY_COLORS: Record<string, string> = {
   starforce: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+  potential: 'bg-green-100 text-green-800 border-green-300',
 };
 
-const CATEGORY_LABELS = {
+const CATEGORY_LABELS: Record<string, string> = {
   starforce: '스타포스',
+  potential: '잠재능력',
 };
 
 export default function RoadmapStepCard({ step }: Props) {
@@ -51,7 +53,10 @@ export default function RoadmapStepCard({ step }: Props) {
                 {CATEGORY_LABELS[candidate.category]}
               </span>
               <h3 className="font-medium text-gray-900">{candidate.label}</h3>
-              {candidate.itemLevel && (
+              {candidate.currentPotentialSummary && (
+                <p className="text-xs text-gray-500">현재: {candidate.currentPotentialSummary}</p>
+              )}
+              {candidate.itemLevel && !candidate.potentialType && (
                 <p className="text-xs text-gray-500">Lv.{candidate.itemLevel} 장비</p>
               )}
             </div>
@@ -61,10 +66,10 @@ export default function RoadmapStepCard({ step }: Props) {
             </div>
           </div>
 
-          {/* 평소 / 샤타포스 비용 비교 */}
+          {/* 비용 정보 */}
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
             <div className="rounded bg-white/60 p-2">
-              <p className="text-gray-500 mb-1">평소</p>
+              <p className="text-gray-500 mb-1">{candidate.category === 'potential' ? '기대비용' : '평소'}</p>
               <p className="font-bold text-gray-800 text-sm">{formatMeso(candidate.expectedCost)}</p>
               <p className="text-gray-500 mt-0.5">
                 환산 1당 {formatCostPerStat(candidate.expectedCost, candidate.convertedStatGain)}
@@ -80,8 +85,17 @@ export default function RoadmapStepCard({ step }: Props) {
               </div>
             ) : (
               <div className="rounded bg-white/60 p-2">
-                <p className="text-gray-400 mb-1">샤타포스</p>
-                <p className="text-gray-400">동일</p>
+                {candidate.category === 'potential' ? (
+                  <>
+                    <p className="text-gray-500 mb-1">{candidate.potentialType === 'main' ? '윗잠' : '에디'}</p>
+                    <p className="text-gray-500">{candidate.targetPotentialLabel}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-400 mb-1">샤타포스</p>
+                    <p className="text-gray-400">동일</p>
+                  </>
+                )}
               </div>
             )}
           </div>

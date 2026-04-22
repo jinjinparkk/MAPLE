@@ -59,6 +59,14 @@ export function generateRoadmap(
     const best = availableCandidates[0]; // 이미 ROI 내림차순 정렬됨
 
     usedIds.add(best.id);
+    // exclusionGroup: 같은 장비+타입의 다른 티어 후보를 모두 제외
+    if (best.exclusionGroup) {
+      for (const c of allCandidates) {
+        if (c.exclusionGroup === best.exclusionGroup) {
+          usedIds.add(c.id);
+        }
+      }
+    }
     remainingBudget -= best.expectedCost;
     cumulativeCost += best.expectedCost;
     cumulativeStatGain += best.convertedStatGain;
