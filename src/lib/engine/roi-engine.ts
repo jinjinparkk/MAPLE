@@ -9,7 +9,7 @@ import { getTotalStarforceStatGain } from '@/lib/calculator/starforce';
 import {
   parsePotential,
   getPotentialConvertedStat,
-  getExpectedResetCost,
+  getExpectedResetResult,
   getCurrentStatPercent,
   getCurrentCritLines,
   getArmorTargets,
@@ -244,7 +244,7 @@ function generatePotentialCandidatesForType(
     // 타겟 생성
     let targets;
     if (equipCategory === 'weapon') {
-      targets = getWeaponTargets(currentConverted);
+      targets = getWeaponTargets(potentialType);
     } else if (equipCategory === 'glove') {
       targets = getGloveTargets(currentStatPct, currentCritLines);
     } else {
@@ -256,29 +256,8 @@ function generatePotentialCandidatesForType(
     const currentSummary = buildPotentialSummary(parsed.lines);
 
     for (const target of targets) {
-      // 타겟 환산스탯 계산 (stat% 기반 타겟의 경우 환산 추정)
-      let targetConverted: number;
-      if (target.minConvertedStat !== undefined) {
-        targetConverted = target.minConvertedStat;
-      } else {
-        // stat% 기반: 타겟 stat%를 환산스탯으로 변환
-        const targetStatPct = target.minStatPercent ?? currentStatPct;
-        targetConverted = convertToMainStat(ctx, {
-          mainStat: ctx.mainStat * targetStatPct / 100,
-        });
-        // 크뎀이 포함된 타겟은 크뎀 가치도 합산
-        if (target.minCritDmgLines && target.minCritDmgLines > 0) {
-          const critPerLine = isMain ? 8 : 4; // 에디 크뎀은 4%
-          targetConverted += convertToMainStat(ctx, {
-            critDamage: critPerLine * target.minCritDmgLines,
-          });
-        }
-      }
-
-      const statGain = targetConverted - currentConverted;
-      if (statGain <= 0) continue;
-
-      const cost = getExpectedResetCost(
+      // 기대비용 + 기대환산스탯 동시 계산
+      const result = getExpectedResetResult(
         equipCategory,
         itemLevel,
         grade,
@@ -286,20 +265,23 @@ function generatePotentialCandidatesForType(
         target,
         ctx,
         potentialType,
-        currentConverted,
       );
 
-      if (!isFinite(cost) || cost <= 0) continue;
+      if (!isFinite(result.cost) || result.cost <= 0) continue;
 
-      const roi = statGain / (cost / 1e8);
+      // 스탯 이득 = 타겟 달성 시 기대환산 - 현재 환산
+      const statGain = result.expectedConvertedStat - currentConverted;
+      if (statGain <= 0) continue;
+
+      const roi = statGain / (result.cost / 1e8);
 
       candidates.push({
         id: `pot-${potentialType}-${item.item_name}-${target.label}`,
         category: 'potential',
         label: `${item.item_name} ${typeLabel} → ${target.label}`,
         description: `잠재능력 ${typeLabel} (Lv.${itemLevel})`,
-        expectedCost: cost,
-        expectedCostShatar: cost, // 잠재능력은 샤타포스 할인 없음
+        expectedCost: result.cost,
+        expectedCostShatar: result.cost,
         convertedStatGain: Math.round(statGain * 10) / 10,
         roi: Math.round(roi * 100) / 100,
         roiShatar: Math.round(roi * 100) / 100,
