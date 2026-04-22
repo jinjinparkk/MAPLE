@@ -41,10 +41,24 @@ export interface PotentialTarget {
 /**
  * 방어구/악세 타겟 티어 (stat% 기준)
  *
- * 250제: 레전 13% × 3줄 = 최대 39%
- * 일반: 레전 12% × 3줄 = 최대 36%
+ * 윗잠: 21/27/30/33/36% (250제 39%)
+ * 에디: 21%만 현실적 (줄 등급 0.5%로 2줄 이상 레전 비현실적)
  */
-export function getArmorTargets(currentStatPct: number, itemLevel: number): PotentialTarget[] {
+export function getArmorTargets(
+  currentStatPct: number,
+  itemLevel: number,
+  potentialType?: PotentialType,
+): PotentialTarget[] {
+  // 에디는 줄 등급 확률이 0.5%이므로 높은 타겟은 비현실적
+  if (potentialType === 'additional') {
+    const tiers = [
+      { pct: 21, label: '스탯 21%' },
+    ];
+    return tiers
+      .filter((t) => t.pct > currentStatPct)
+      .map((t) => ({ label: t.label, minStatPercent: t.pct }));
+  }
+
   const tiers = [
     { pct: 21, label: '스탯 21%' },
     { pct: 27, label: '스탯 27%' },
@@ -66,7 +80,7 @@ export function getArmorTargets(currentStatPct: number, itemLevel: number): Pote
  * 무기/보조/엠블렘 타겟 티어 (줄 수 기반)
  *
  * 윗잠: 보뎀 2줄 → 보뎀 2줄+공/마 → 보뎀 3줄
- * 에디: 보뎀 1줄 → 보뎀 1줄+공/마
+ * 에디: 공/마 1줄 → 공/마 2줄 (에디 보뎀 12~18%로 낮아 공/마가 정석)
  */
 export function getWeaponTargets(potentialType: PotentialType): PotentialTarget[] {
   if (potentialType === 'main') {
@@ -76,10 +90,10 @@ export function getWeaponTargets(potentialType: PotentialType): PotentialTarget[
       { label: '보뎀 3줄', minBossDmgLines: 3 },
     ];
   }
-  // additional — 에디 보뎀은 12%로 낮기 때문에 1줄/2줄 위주
+  // additional — 에디 보뎀은 12~18%로 낮으므로 공/마%가 정석 타겟
   return [
-    { label: '보뎀 1줄', minBossDmgLines: 1 },
-    { label: '보뎀 1줄+공/마', minBossDmgLines: 1, minAtkLines: 1 },
+    { label: '공/마 1줄', minAtkLines: 1 },
+    { label: '공/마 2줄', minAtkLines: 2 },
   ];
 }
 

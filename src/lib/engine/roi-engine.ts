@@ -250,7 +250,7 @@ function generatePotentialCandidatesForType(
     } else if (equipCategory === 'glove') {
       targets = getGloveTargets(currentStatPct, currentCritLines);
     } else {
-      targets = getArmorTargets(currentStatPct, itemLevel);
+      targets = getArmorTargets(currentStatPct, itemLevel, potentialType);
     }
 
     const typeLabel = isMain ? '윗잠' : '에디';
