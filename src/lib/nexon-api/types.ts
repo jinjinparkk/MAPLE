@@ -61,7 +61,7 @@ export interface ItemOption {
 /** 장비 아이템 */
 export interface EquipmentItem {
   item_equipment_part: string;
-  equipment_slot: string;
+  item_equipment_slot: string;
   item_name: string;
   item_icon: string;
   item_description: string | null;

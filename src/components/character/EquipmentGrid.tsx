@@ -37,21 +37,28 @@ function buildEquipMap(equipment: EquipmentItem[]): Map<string, EquipmentItem> {
   const unknowns: EquipmentItem[] = [];
 
   for (const item of equipment) {
+    // item_equipment_slot은 표준 슬롯명 (무기, 보조무기 등), item_equipment_part는 직업별로 다를 수 있음
+    const slot = item.item_equipment_slot;
     const part = item.item_equipment_part;
 
-    if (part === '반지') {
+    if (slot === '반지1' || slot === '반지2' || slot === '반지3' || slot === '반지4') {
+      map.set(slot, item);
+    } else if (part === '반지') {
       if (ringIdx <= 4) map.set(`반지${ringIdx++}`, item);
+    } else if (slot === '펜던트' || slot === '펜던트2') {
+      map.set(slot, item);
     } else if (part === '펜던트') {
       map.set(pendantIdx === 1 ? '펜던트' : '펜던트2', item);
       pendantIdx++;
-    } else if (part === '무기') {
+    } else if (slot === '무기' || part === '무기') {
       map.set('무기', item);
-    } else if (part === '보조무기') {
+    } else if (slot === '보조무기' || part === '보조무기') {
       map.set('보조무기', item);
+    } else if (SINGLE_PARTS.has(slot)) {
+      map.set(slot, item);
     } else if (SINGLE_PARTS.has(part)) {
       map.set(part, item);
     } else {
-      // 직업별 고유 부위명 (브레이슬릿, 튜너 등) → 무기/보조무기 슬롯에 배치
       unknowns.push(item);
     }
   }
