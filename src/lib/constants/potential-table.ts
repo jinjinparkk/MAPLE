@@ -1,14 +1,17 @@
 /**
  * 잠재능력 시스템 상수 (2024 메소화 이후 기준)
  *
- * 윗잠(main potential) = 블랙 큐브 재설정
+ * 윗잠(main potential) = 블랙 큐브 재설정 (블큐 확률 동일)
  * 에디(additional potential) = 에디셔널 큐브 재설정
+ *
+ * 데이터 소스: 넥슨 공식 확률 공개 페이지 + 테스트 월드 패치노트
  *
  * 주요 차이점:
  * - 250제: 레전 주스탯 13%, 유니크 10% (일반: 12%/9%)
  * - 에디: 레전 주스탯 10%, 유니크 6% (윗잠보다 낮음)
  * - 에디 무기: 보뎀 12%, 방무 10% (윗잠: 30~40%)
  * - 에디 장갑: 크뎀 4% (윗잠: 8%)
+ * - 줄 등급: 윗잠 2줄 20%/3줄 5%, 에디 2줄 0.4975%/3줄 0.4975%
  */
 
 export type PotentialGrade = 'rare' | 'epic' | 'unique' | 'legendary';
@@ -17,19 +20,19 @@ export type PotentialType = 'main' | 'additional';
 
 export type EquipPotentialCategory = 'weapon' | 'glove' | 'armor';
 
-// ── 재설정 비용 (메소) ──
+// ── 재설정 비용 (메소) — 넥슨 테스트 월드 패치노트 기준 ──
 export const MAIN_RESET_COST: Record<string, Record<PotentialGrade, number>> = {
-  '1-159':   { rare: 4_000_000, epic: 10_000_000, unique: 20_000_000, legendary: 40_000_000 },
-  '160-199': { rare: 5_000_000, epic: 12_500_000, unique: 25_000_000, legendary: 50_000_000 },
-  '200-249': { rare: 6_000_000, epic: 15_000_000, unique: 30_000_000, legendary: 50_000_000 },
-  '250+':    { rare: 6_000_000, epic: 15_000_000, unique: 30_000_000, legendary: 50_000_000 },
+  '1-159':   { rare: 4_000_000, epic: 16_000_000, unique: 34_000_000, legendary: 40_000_000 },
+  '160-199': { rare: 4_250_000, epic: 17_000_000, unique: 36_125_000, legendary: 42_500_000 },
+  '200-249': { rare: 4_500_000, epic: 18_000_000, unique: 38_250_000, legendary: 45_000_000 },
+  '250+':    { rare: 5_000_000, epic: 20_000_000, unique: 42_500_000, legendary: 50_000_000 },
 };
 
 export const ADDI_RESET_COST: Record<string, Record<PotentialGrade, number>> = {
-  '1-159':   { rare: 9_750_000, epic: 24_500_000, unique: 49_000_000, legendary: 98_000_000 },
-  '160-199': { rare: 9_750_000, epic: 24_500_000, unique: 49_000_000, legendary: 98_000_000 },
-  '200-249': { rare: 9_750_000, epic: 24_500_000, unique: 49_000_000, legendary: 98_000_000 },
-  '250+':    { rare: 9_750_000, epic: 24_500_000, unique: 49_000_000, legendary: 98_000_000 },
+  '1-159':   { rare: 13_000_000, epic: 36_400_000, unique: 44_200_000, legendary: 52_000_000 },
+  '160-199': { rare: 13_812_500, epic: 38_675_000, unique: 46_962_500, legendary: 55_250_000 },
+  '200-249': { rare: 14_625_000, epic: 40_950_000, unique: 49_725_000, legendary: 58_500_000 },
+  '250+':    { rare: 16_250_000, epic: 45_500_000, unique: 55_250_000, legendary: 65_000_000 },
 };
 
 export function getLevelBracket(itemLevel: number): string {
@@ -49,35 +52,43 @@ export function getResetCost(
   return table[bracket][grade];
 }
 
-// ── 등급업 확률 ──
+// ── 등급업 확률 (넥슨 공식 확률 공개) ──
 export const TIER_UP_RATES: Record<PotentialType, Record<string, number>> = {
   main: {
-    'rare_to_epic': 0.0999,
-    'epic_to_unique': 0.036,
+    'rare_to_epic': 0.15,
+    'epic_to_unique': 0.035,
     'unique_to_legendary': 0.014,
   },
   additional: {
-    'rare_to_epic': 0.0495,
-    'epic_to_unique': 0.018,
+    'rare_to_epic': 0.02381,
+    'epic_to_unique': 0.009804,
     'unique_to_legendary': 0.007,
   },
 };
 
-// ── 천장(pity) ──
-export const PITY_COUNT: Record<PotentialType, number> = {
-  main: 107,
-  additional: 214,
-};
-
-// ── 줄 등급 확률 ──
-export const LINE_GRADE_PROB: Record<PotentialType, { line2: number; line3: number }> = {
+// ── 천장(pity) — 등급 전환별 개별 천장 ──
+export const PITY_COUNT: Record<PotentialType, Record<string, number>> = {
   main: {
-    line2: 0.10,
-    line3: 0.01,
+    'rare_to_epic': 10,
+    'epic_to_unique': 42,
+    'unique_to_legendary': 107,
   },
   additional: {
-    line2: 0.02,
-    line3: 0.02,
+    'rare_to_epic': 62,
+    'epic_to_unique': 152,
+    'unique_to_legendary': 214,
+  },
+};
+
+// ── 줄 등급 확률 (블큐=윗잠 재설정, 에디큐=에디 재설정) ──
+export const LINE_GRADE_PROB: Record<PotentialType, { line2: number; line3: number }> = {
+  main: {
+    line2: 0.20,
+    line3: 0.05,
+  },
+  additional: {
+    line2: 0.004975,
+    line3: 0.004975,
   },
 };
 

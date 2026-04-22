@@ -141,7 +141,7 @@ export function getTierUpExpectedCost(
     if (!prob) continue;
 
     const resetCost = getResetCost(potentialType, itemLevel, currentGrade);
-    const pity = PITY_COUNT[potentialType];
+    const pity = PITY_COUNT[potentialType][tierKey];
     const expectedResets = expectedTrialsWithPity(prob, pity);
 
     totalCost += expectedResets * resetCost;
