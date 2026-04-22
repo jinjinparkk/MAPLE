@@ -97,15 +97,15 @@ export default function WrappedClient({ data }: { data: WrappedData }) {
         </p>
 
         {/* ── 캐릭터 프로필 ── */}
-        <div className="flex flex-col items-center gap-3 mb-8">
+        <div className="flex flex-col items-center gap-2 mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={data.characterImage}
             alt={data.nickname}
-            width={180}
-            height={180}
-            style={{ imageRendering: 'pixelated' }}
-            className="drop-shadow-[0_0_40px_rgba(168,85,247,0.25)]"
+            width={300}
+            height={300}
+            style={{ imageRendering: 'pixelated', margin: '-20px 0' }}
+            className="drop-shadow-[0_0_50px_rgba(168,85,247,0.3)]"
           />
           <h1 className="text-2xl font-bold text-white">{data.nickname}</h1>
           <p className="text-sm text-white/50">
