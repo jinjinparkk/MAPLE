@@ -2,7 +2,7 @@ import type { CharacterFullData } from '@/lib/nexon-api/types';
 import { extractStatContext } from '@/lib/calculator/stat-converter';
 import { generateAllCandidates } from './roi-engine';
 import { getPresetEquipment } from '@/lib/utils/equipment';
-import type { UpgradeCandidate } from './roi-engine';
+import type { UpgradeCandidate, UpgradeCategory } from './roi-engine';
 
 export interface RoadmapStep {
   order: number;
@@ -46,17 +46,27 @@ export function generateRoadmap(
   let cumulativeStatGain = 0;
   const usedIds = new Set<string>();
 
-  // Greedy loop (최대 50단계로 제한)
+  // 라운드로빈: 스타포스↔잠재 교대 선택하여 양쪽 모두 로드맵에 표시
+  const categories: UpgradeCategory[] = ['starforce', 'potential'];
+  let categoryIdx = 0;
+
   for (let i = 0; i < 50; i++) {
-    // 남은 예산으로 가능한 후보 필터링
-    const availableCandidates = allCandidates.filter(
-      (c) => !usedIds.has(c.id) && c.expectedCost <= remainingBudget,
-    );
+    let best: UpgradeCandidate | null = null;
 
-    if (availableCandidates.length === 0) break;
+    // 현재 차례 카테고리부터 시도, 없으면 다른 카테고리로 폴백
+    for (let attempt = 0; attempt < categories.length; attempt++) {
+      const cat = categories[(categoryIdx + attempt) % categories.length];
+      const available = allCandidates.filter(
+        (c) => !usedIds.has(c.id) && c.expectedCost <= remainingBudget && c.category === cat,
+      );
+      if (available.length > 0) {
+        best = available[0]; // 이미 ROI 내림차순 정렬됨
+        categoryIdx = (categoryIdx + attempt + 1) % categories.length;
+        break;
+      }
+    }
 
-    // ROI가 가장 높은 후보 선택
-    const best = availableCandidates[0]; // 이미 ROI 내림차순 정렬됨
+    if (!best) break;
 
     usedIds.add(best.id);
     // exclusionGroup: 같은 장비+타입의 다른 티어 후보를 모두 제외
