@@ -25,7 +25,7 @@ export default function SearchForm() {
       // localStorage 실패 무시
     }
 
-    router.push(`/character/${encodeURIComponent(trimmed)}`);
+    router.push(`/wrapped/${encodeURIComponent(trimmed)}`);
   };
 
   return (
@@ -35,12 +35,12 @@ export default function SearchForm() {
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
         placeholder="메이플스토리 닉네임을 입력하세요"
-        className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-base placeholder-gray-400 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-base text-white placeholder-white/40 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
         maxLength={12}
         disabled={isLoading}
       />
       <Button type="submit" size="lg" disabled={isLoading || !nickname.trim()}>
-        {isLoading ? '검색 중...' : '검색'}
+        {isLoading ? '분석 중...' : '분석'}
       </Button>
     </form>
   );

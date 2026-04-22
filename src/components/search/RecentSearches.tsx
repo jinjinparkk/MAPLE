@@ -25,10 +25,10 @@ export default function RecentSearches() {
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-gray-500">최근 검색</h3>
+        <h3 className="text-sm font-medium text-white/50">최근 검색</h3>
         <button
           onClick={handleClear}
-          className="text-xs text-gray-400 hover:text-gray-600"
+          className="text-xs text-white/30 hover:text-white/60"
         >
           전체 삭제
         </button>
@@ -37,8 +37,8 @@ export default function RecentSearches() {
         {searches.map((name) => (
           <Link
             key={name}
-            href={`/character/${encodeURIComponent(name)}`}
-            className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-orange-100 hover:text-orange-700 transition-colors"
+            href={`/wrapped/${encodeURIComponent(name)}`}
+            className="rounded-full bg-white/10 px-3 py-1 text-sm text-white/70 hover:bg-purple-500/20 hover:text-purple-300 transition-colors"
           >
             {name}
           </Link>
