@@ -87,9 +87,10 @@ function isStarforceableSubWeapon(item: EquipmentItem): boolean {
 }
 
 function canStarforce(item: EquipmentItem): boolean {
-  if (STARFORCE_EXCLUDED_PARTS.has(item.item_equipment_part)) return false;
+  const slot = item.equipment_slot || item.item_equipment_part;
+  if (STARFORCE_EXCLUDED_PARTS.has(slot)) return false;
   // 보조무기는 화이트리스트 키워드 포함 시만 허용
-  if (item.item_equipment_part === '보조무기' && !isStarforceableSubWeapon(item)) return false;
+  if (slot === '보조무기' && !isStarforceableSubWeapon(item)) return false;
   if (item.starforce === undefined || item.starforce === null) return false;
   if (item.special_ring_level > 0) return false;
   const name = item.item_name;
@@ -192,7 +193,8 @@ function generateStarforceCandidates(
 
 /** 잠재능력 불가 판별 */
 function canPotential(item: EquipmentItem): boolean {
-  if (POTENTIAL_EXCLUDED_PARTS.has(item.item_equipment_part)) return false;
+  const slot = item.equipment_slot || item.item_equipment_part;
+  if (POTENTIAL_EXCLUDED_PARTS.has(slot)) return false;
   if (item.special_ring_level > 0) return false;
   return true;
 }
@@ -238,7 +240,7 @@ function generatePotentialCandidatesForType(
     const currentCritLines = getCurrentCritLines(parsed.lines);
 
     const itemLevel = getItemLevel(item);
-    const equipCategory = getEquipmentPotentialCategory(item.item_equipment_part);
+    const equipCategory = getEquipmentPotentialCategory(item.equipment_slot || item.item_equipment_part);
     const targetGrade = 'legendary' as const;
 
     // 타겟 생성
