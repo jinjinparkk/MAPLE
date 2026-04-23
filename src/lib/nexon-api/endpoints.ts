@@ -21,4 +21,6 @@ export const ENDPOINTS = {
   HEXA_MATRIX_STAT: '/maplestory/v1/character/hexamatrix-stat',
   /** 유니온 */
   UNION: '/maplestory/v1/user/union',
+  /** 펫 장비 */
+  PET_EQUIPMENT: '/maplestory/v1/character/pet-equipment',
 } as const;

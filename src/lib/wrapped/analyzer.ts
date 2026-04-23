@@ -2,6 +2,7 @@ import type { CharacterFullData, EquipmentItem } from '@/lib/nexon-api/types';
 import { getBestPresetEquipment } from '@/lib/utils/equipment';
 import type {
   WrappedData,
+  PetInfo,
   StarforceAnalysis,
   PotentialAnalysis,
   SymbolAnalysis,
@@ -202,6 +203,28 @@ export function analyzeCharacter(data: CharacterFullData): WrappedData {
     hexa.grade = 'F';
   }
 
+  // 캐릭터 생성일 + D+일수
+  const createDate = data.basic.character_date_create || null;
+  let daysWithMaple: number | null = null;
+  if (createDate) {
+    const created = new Date(createDate);
+    const now = new Date();
+    daysWithMaple = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  // 펫 정보
+  const pets: PetInfo[] = [];
+  const pet = data.petEquipment;
+  if (pet) {
+    for (const n of [1, 2, 3] as const) {
+      const name = pet[`pet_${n}_name`];
+      const icon = pet[`pet_${n}_icon`];
+      if (name && icon) {
+        pets.push({ name, nickname: pet[`pet_${n}_nickname`], icon });
+      }
+    }
+  }
+
   const partial: WrappedData = {
     nickname: data.basic.character_name,
     level: data.basic.character_level,
@@ -209,6 +232,9 @@ export function analyzeCharacter(data: CharacterFullData): WrappedData {
     worldName: data.basic.world_name,
     guildName: data.basic.character_guild_name,
     characterImage: data.basic.character_image,
+    characterCreateDate: createDate,
+    daysWithMaple,
+    pets,
     starforce,
     potential,
     symbol,

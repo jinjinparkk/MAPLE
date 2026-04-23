@@ -222,6 +222,32 @@ export interface UserUnion {
   union_artifact_point: number;
 }
 
+/** 펫 장비 */
+export interface CharacterPetEquipment {
+  date: string;
+  pet_1_name: string | null;
+  pet_1_nickname: string | null;
+  pet_1_icon: string | null;
+  pet_1_description: string | null;
+  pet_1_appearance: string | null;
+  pet_1_appearance_icon: string | null;
+  pet_1_date_expire: string | null;
+  pet_2_name: string | null;
+  pet_2_nickname: string | null;
+  pet_2_icon: string | null;
+  pet_2_description: string | null;
+  pet_2_appearance: string | null;
+  pet_2_appearance_icon: string | null;
+  pet_2_date_expire: string | null;
+  pet_3_name: string | null;
+  pet_3_nickname: string | null;
+  pet_3_icon: string | null;
+  pet_3_description: string | null;
+  pet_3_appearance: string | null;
+  pet_3_appearance_icon: string | null;
+  pet_3_date_expire: string | null;
+}
+
 /** 종합 캐릭터 데이터 */
 export interface CharacterFullData {
   basic: CharacterBasic;
@@ -233,4 +259,5 @@ export interface CharacterFullData {
   hexaMatrix: CharacterHexaMatrix;
   hexaMatrixStat: CharacterHexaMatrixStat;
   union: UserUnion;
+  petEquipment: CharacterPetEquipment | null;
 }

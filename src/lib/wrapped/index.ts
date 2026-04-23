@@ -1,6 +1,7 @@
 export type {
   Grade,
   WrappedData,
+  PetInfo,
   StarforceAnalysis,
   PotentialAnalysis,
   SymbolAnalysis,

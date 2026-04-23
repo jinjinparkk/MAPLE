@@ -141,6 +141,11 @@ export default function WrappedClient({ data }: { data: WrappedData }) {
             Lv.{data.level} {data.jobName} · {data.worldName}
             {data.guildName && ` · ${data.guildName}`}
           </p>
+          {data.daysWithMaple != null && (
+            <p className="text-xs text-purple-300/70 mt-1">
+              메이플과 함께한 지 <span className="font-bold text-purple-300">{data.daysWithMaple.toLocaleString()}</span>일째
+            </p>
+          )}
         </div>
 
         {/* ── 종합 등급 ── */}
@@ -202,6 +207,26 @@ export default function WrappedClient({ data }: { data: WrappedData }) {
           <Gauge label="유니온" icon="\uD83C\uDFAF" value={data.union.grade} sub={`Lv.${data.union.unionLevel.toLocaleString()}`} grade={data.union.grade} />
           <Gauge label="헥사" icon="\u2B21" value={data.hexa.grade} sub={`코어합 ${data.hexa.totalCoreLevel}`} grade={data.hexa.grade} />
         </div>
+
+        {/* ── 펫 ── */}
+        {data.pets.length > 0 && (
+          <div className="rounded-2xl p-5 mt-3" style={{
+            background: 'linear-gradient(135deg, rgba(251,146,60,0.06) 0%, rgba(251,191,36,0.04) 100%)',
+            border: '1px solid rgba(251,146,60,0.12)',
+          }}>
+            <h3 className="text-sm font-medium text-white/60 mb-3">{'\uD83D\uDC3E'} 내 펫</h3>
+            <div className="flex justify-center gap-4">
+              {data.pets.map((pet, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={pet.icon} alt={pet.name} width={48} height={48} />
+                  <p className="text-xs font-medium text-white/80">{pet.nickname || pet.name}</p>
+                  <p className="text-[10px] text-white/30">{pet.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <p className="text-center text-[9px] text-white/15 mt-4">maple-specup.vercel.app</p>
       </div>

@@ -44,6 +44,12 @@ export interface HexaAnalysis {
   grade: Grade;
 }
 
+export interface PetInfo {
+  name: string;
+  nickname: string | null;
+  icon: string;
+}
+
 export interface WrappedData {
   nickname: string;
   level: number;
@@ -51,6 +57,9 @@ export interface WrappedData {
   worldName: string;
   guildName: string | null;
   characterImage: string;
+  characterCreateDate: string | null;
+  daysWithMaple: number | null;
+  pets: PetInfo[];
   starforce: StarforceAnalysis;
   potential: PotentialAnalysis;
   symbol: SymbolAnalysis;

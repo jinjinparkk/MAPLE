@@ -11,6 +11,7 @@ import type {
   CharacterHexaMatrix,
   CharacterHexaMatrixStat,
   UserUnion,
+  CharacterPetEquipment,
   CharacterFullData,
 } from './types';
 
@@ -38,6 +39,7 @@ export async function fetchCharacterFullData(
     hexaMatrixResult,
     hexaMatrixStatResult,
     unionResult,
+    petResult,
   ] = await Promise.allSettled([
     nexonFetch<CharacterBasic>(ENDPOINTS.BASIC, params),
     nexonFetch<CharacterStat>(ENDPOINTS.STAT, params),
@@ -48,6 +50,7 @@ export async function fetchCharacterFullData(
     nexonFetch<CharacterHexaMatrix>(ENDPOINTS.HEXA_MATRIX, params),
     nexonFetch<CharacterHexaMatrixStat>(ENDPOINTS.HEXA_MATRIX_STAT, params),
     nexonFetch<UserUnion>(ENDPOINTS.UNION, params),
+    nexonFetch<CharacterPetEquipment>(ENDPOINTS.PET_EQUIPMENT, params),
   ]);
 
   function unwrap<T>(result: PromiseSettledResult<T>, name: string): T {
@@ -65,5 +68,6 @@ export async function fetchCharacterFullData(
     hexaMatrix: unwrap(hexaMatrixResult, 'hexaMatrix'),
     hexaMatrixStat: unwrap(hexaMatrixStatResult, 'hexaMatrixStat'),
     union: unwrap(unionResult, 'union'),
+    petEquipment: petResult.status === 'fulfilled' ? petResult.value : null,
   };
 }
