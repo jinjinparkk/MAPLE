@@ -74,8 +74,13 @@ export function gradeOverall(data: WrappedData): { grade: Grade; score: number }
     GRADE_SCORE[data.hexa.grade] * weights.hexa,
   );
 
+  // 모든 카테고리가 F면 종합도 F
+  const allF = [data.starforce, data.potential, data.symbol, data.union, data.hexa]
+    .every((c) => c.grade === 'F');
+
   let grade: Grade;
-  if (score >= 90) grade = 'S';
+  if (allF) grade = 'F';
+  else if (score >= 90) grade = 'S';
   else if (score >= 70) grade = 'A';
   else if (score >= 50) grade = 'B';
   else if (score >= 30) grade = 'C';
