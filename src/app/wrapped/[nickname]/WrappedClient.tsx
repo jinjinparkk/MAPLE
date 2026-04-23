@@ -84,15 +84,19 @@ export default function WrappedClient({ data }: { data: WrappedData }) {
     } catch { /* ignore */ }
   };
 
-  const isHajongyang = data.nickname === '하종양';
+  const easterEgg: Record<string, string> = {
+    '하종양': '메소, 사지 말고 캐세요.',
+    '땅지': '안셕시한사람',
+    '뚜둡': '애인구함',
+  };
+  const easterMsg = easterEgg[data.nickname];
 
   return (
     <div className="min-h-dvh bg-[#08080f]">
-      {/* 하종양 이스터에그 */}
-      {isHajongyang && (
+      {easterMsg && (
         <div className="max-w-lg mx-auto px-4 pt-6">
           <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-5 py-4 text-center">
-            <p className="text-red-400 font-bold text-lg">메소, 사지 말고 캐세요.</p>
+            <p className="text-red-400 font-bold text-lg">{easterMsg}</p>
           </div>
         </div>
       )}
