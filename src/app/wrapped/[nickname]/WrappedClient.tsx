@@ -5,10 +5,10 @@ import type { WrappedData, Grade } from '@/lib/wrapped/types';
 import { generateCardImage, shareCard, generateShareUrl } from '@/lib/wrapped/share';
 
 const gradeColor: Record<Grade, string> = {
-  S: '#ffd700', A: '#a855f7', B: '#3b82f6', C: '#22c55e', D: '#6b7280',
+  S: '#ffd700', A: '#a855f7', B: '#3b82f6', C: '#22c55e', D: '#6b7280', F: '#ef4444',
 };
 
-const GRADE_PCT: Record<Grade, number> = { S: 100, A: 80, B: 60, C: 40, D: 20 };
+const GRADE_PCT: Record<Grade, number> = { S: 100, A: 80, B: 60, C: 40, D: 20, F: 5 };
 
 /* ─── 게이지 행 ─── */
 function Gauge({ label, value, sub, grade }: { label: string; value: string; sub?: string; grade: Grade }) {

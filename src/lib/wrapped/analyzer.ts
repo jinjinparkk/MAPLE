@@ -193,6 +193,11 @@ export function analyzeCharacter(data: CharacterFullData): WrappedData {
   const union = analyzeUnion(data);
   const hexa = analyzeHexa(data);
 
+  // 이스터에그
+  if (data.basic.character_name === '뚜둡') {
+    starforce.grade = 'F';
+  }
+
   const partial: WrappedData = {
     nickname: data.basic.character_name,
     level: data.basic.character_level,

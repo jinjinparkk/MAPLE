@@ -1,4 +1,4 @@
-export type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
+export type Grade = 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
 
 export interface StarforceAnalysis {
   totalStars: number;

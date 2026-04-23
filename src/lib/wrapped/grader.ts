@@ -10,10 +10,10 @@ import type {
 
 export function gradeStarforce(analysis: StarforceAnalysis): Grade {
   const avg = analysis.avgStar;
-  if (avg >= 22) return 'S';
-  if (avg >= 19) return 'A';
-  if (avg >= 17) return 'B';
-  if (avg >= 15) return 'C';
+  if (avg >= 17) return 'S';
+  if (avg >= 15) return 'A';
+  if (avg >= 13) return 'B';
+  if (avg >= 10) return 'C';
   return 'D';
 }
 
@@ -55,7 +55,7 @@ export function gradeHexa(analysis: HexaAnalysis): Grade {
   return 'D';
 }
 
-const GRADE_SCORE: Record<Grade, number> = { S: 100, A: 80, B: 60, C: 40, D: 20 };
+const GRADE_SCORE: Record<Grade, number> = { S: 100, A: 80, B: 60, C: 40, D: 20, F: 0 };
 
 export function gradeOverall(data: WrappedData): { grade: Grade; score: number } {
   const weights = {

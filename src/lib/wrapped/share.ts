@@ -1,23 +1,62 @@
 import html2canvas from 'html2canvas';
 
-export async function generateCardImage(cardElement: HTMLElement): Promise<Blob> {
-  const canvas = await html2canvas(cardElement, {
-    backgroundColor: '#0a0a0a',
-    scale: 2,
-    useCORS: true,
-    logging: false,
-  });
+/** 외부 이미지를 data URL로 변환 (CORS 우회) */
+async function convertImagesToDataUrl(container: HTMLElement): Promise<() => void> {
+  const imgs = container.querySelectorAll('img');
+  const originals: { img: HTMLImageElement; src: string }[] = [];
 
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error('이미지 생성 실패'));
-      },
-      'image/png',
-      1.0,
-    );
-  });
+  await Promise.all(
+    Array.from(imgs).map(async (img) => {
+      if (img.src.startsWith('data:')) return;
+      originals.push({ img, src: img.src });
+      try {
+        const res = await fetch(img.src);
+        const blob = await res.blob();
+        const dataUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+        img.src = dataUrl;
+      } catch {
+        // 변환 실패 시 원본 유지
+      }
+    }),
+  );
+
+  // 복원 함수 반환
+  return () => {
+    for (const { img, src } of originals) {
+      img.src = src;
+    }
+  };
+}
+
+export async function generateCardImage(cardElement: HTMLElement): Promise<Blob> {
+  const restore = await convertImagesToDataUrl(cardElement);
+
+  try {
+    const canvas = await html2canvas(cardElement, {
+      backgroundColor: '#08080f',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    });
+
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('이미지 생성 실패'));
+        },
+        'image/png',
+        1.0,
+      );
+    });
+  } finally {
+    restore();
+  }
 }
 
 export async function shareCard(blob: Blob, title: string): Promise<void> {
@@ -39,7 +78,9 @@ export async function shareCard(blob: Blob, title: string): Promise<void> {
   const a = document.createElement('a');
   a.href = url;
   a.download = `${title}.png`;
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   URL.revokeObjectURL(url);
 }
 
